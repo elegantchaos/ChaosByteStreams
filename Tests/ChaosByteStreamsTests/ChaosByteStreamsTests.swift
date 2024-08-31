@@ -3,16 +3,32 @@ import Testing
 
 @testable import ChaosByteStreams
 
-@Test func testPipeByteStream() async throws {
-  let pipe = Pipe()
+let testLines = ["hello", "world"]
+let testBytes = testLines.joined(separator: "\n").data(using: .utf8)!
 
-  var output = ["hello", "world"]
-  let input = pipe.bytes
+func makeTestPipeForInput() -> Pipe {
+  let pipe = Pipe()
   let handle = pipe.fileHandleForWriting
-  handle.write(output.joined(separator: "\n").data(using: .utf8)!)
+  handle.write(testBytes)
   handle.closeFile()
+  return pipe
+}
+
+@Test func testPipeByteStream() async throws {
+  let input = makeTestPipeForInput().bytes
+  var expected = testLines
   for await l in input.lines {
-    #expect(l == output.first)
-    output.removeFirst()
+    #expect(l == expected.first)
+    expected.removeFirst()
   }
+}
+
+@Test func testStreamToData() async throws {
+  let data = await Data(makeTestPipeForInput().bytes)
+  #expect(data == testBytes)
+}
+
+@Test func testStreamToString() async throws {
+  let string = await String(makeTestPipeForInput().bytes)
+  #expect(string == testLines.joined(separator: "\n"))
 }
