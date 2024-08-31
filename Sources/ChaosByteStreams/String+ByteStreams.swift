@@ -1,5 +1,6 @@
 import Foundation
 
+/// Byte stream extensions for strings.
 extension String {
   /// Initialise a string from an async byte stream.
   public init<T: AsyncSequence>(_ sequence: T, encoding: String.Encoding = .utf8) async

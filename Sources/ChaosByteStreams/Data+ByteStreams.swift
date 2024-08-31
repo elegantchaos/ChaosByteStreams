@@ -1,5 +1,6 @@
 import Foundation
 
+/// Byte stream extensions for data.
 extension Data {
   /// Initialise a data buffer from an async stream of bytes.
   /// Consumes the entire sequence.
