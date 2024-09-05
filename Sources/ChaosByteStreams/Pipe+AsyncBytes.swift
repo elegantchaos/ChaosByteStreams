@@ -14,8 +14,10 @@ extension Pipe {
     /// Make an iterator that reads data from the pipe's file handle
     /// and outputs it as a byte sequence.
     public func makeAsyncIterator() -> AsyncStream<Element>.Iterator {
+      print("makeAsyncIterator")
       let fh = forwardHandle
       return AsyncStream { continuation in
+        print("continuation")
         // if we have no pipe, return an empty sequence
         guard let pipe else {
           continuation.finish()
@@ -23,6 +25,7 @@ extension Pipe {
         }
 
         pipe.fileHandleForReading.readabilityHandler = { @Sendable handle in
+          print("readabilityHandler")
           let data = handle.availableData
 
           guard !data.isEmpty else {
@@ -32,6 +35,7 @@ extension Pipe {
 
           fh?.write(data)
           for byte in data {
+            print(byte)
             continuation.yield(byte)
           }
         }
