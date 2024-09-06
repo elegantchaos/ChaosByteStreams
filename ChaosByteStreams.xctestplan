@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "1D4B73E0-AA6E-4189-A1D1-10FB64DC2D00",
+      "name" : "Configuration 1",
+      "options" : {
+        "threadSanitizerEnabled" : true
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "threadSanitizerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "skippedTests" : {
+        "testFunctions" : [
+          "testByteStreamToData()",
+          "testByteStreamToString()"
+        ]
+      },
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "ChaosByteStreamsTests",
+        "name" : "ChaosByteStreamsTests"
+      }
+    }
+  ],
+  "version" : 2
+}
