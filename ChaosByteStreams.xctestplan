@@ -13,12 +13,6 @@
   },
   "testTargets" : [
     {
-      "skippedTests" : {
-        "testFunctions" : [
-          "testByteStreamToData()",
-          "testByteStreamToString()"
-        ]
-      },
       "target" : {
         "containerPath" : "container:",
         "identifier" : "ChaosByteStreamsTests",
