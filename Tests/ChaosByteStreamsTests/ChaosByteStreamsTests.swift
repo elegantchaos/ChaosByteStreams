@@ -16,29 +16,28 @@ func makeTestBuffer() async -> DataBuffer {
         await buffer.append(Data([byte]))
         try? await Task.sleep(nanoseconds: 10)
       }
-      await buffer.finish()
+      await buffer.close()
     }
   }
   return buffer
 }
 
-@Test func testBufferByteStream() async throws {
+@Test func testByteStreamLines() async throws {
   let buffer = await makeTestBuffer()
   var expected = testLines
-  let input = await buffer.bytes
   
-  for await l in input.lines {
+  for await l in await buffer.lines {
     #expect(l == expected.first)
     expected.removeFirst()
   }
 }
 
 @Test func testByteStreamToData() async throws {
-  let data = await Data(makeTestBuffer().bytes)
-  #expect(data == testBytes)
+  let buffer = await makeTestBuffer()
+  #expect(await buffer.data  == testBytes)
 }
 
 @Test func testByteStreamToString() async throws {
-  let string = await String(makeTestBuffer().bytes)
-  #expect(string == testLines.joined(separator: "\n"))
+  let buffer = await makeTestBuffer()
+  #expect(await buffer.string == testLines.joined(separator: "\n"))
 }
