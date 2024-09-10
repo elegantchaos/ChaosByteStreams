@@ -13,8 +13,9 @@ public actor DataBuffer {
   public init() {
   }
 
-  private(set) var buffer = Data()
+  public private(set) var buffer = Data()
   private(set) var continuations: [AsyncStream<UInt8>.Continuation] = []
+  private var closed = false
 
   /// Append data to the buffer.
   /// We'll notify all continuations that new data is available.
@@ -31,18 +32,23 @@ public actor DataBuffer {
   /// We'll notify all continuations that the buffer is done, closing
   /// all streams reading from it.
   public func close() {
+    closed = true
     for continuation in continuations { continuation.finish() }
     continuations.removeAll()
   }
 
   /// Add a continuation to the buffer.
   /// We immediately yield all current data in the buffer to the continuation.
-  /// When new data is available, we'll yield it to the continuation.
+  /// If the buffer is already closed, we'll finish the continuation.
+  /// If not, when new data is available, we'll yield it to the continuation.
   public nonisolated func registerContinuation(_ continuation: AsyncStream<UInt8>.Continuation) {
     Task.detached { [weak self] in
-      await self?._registerContinuation(continuation)
-      if let bytes = await self?.buffer {
-        DataBuffer.sendBytes(bytes, to: continuation)
+      if let self {
+        await self._registerContinuation(continuation)
+        DataBuffer.sendBytes(await self.buffer, to: continuation)
+        if await self.closed {
+          continuation.finish()
+        }
       }
     }
   }
